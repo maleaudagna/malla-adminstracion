@@ -59,7 +59,7 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             width: 100%;
-            max-width: 1400px;
+            max-width: 1500px;
         }
 
         /* --- Year Column --- */
@@ -89,11 +89,14 @@
             border: 1px solid var(--color-border);
             border-left: 5px solid var(--color-header);
             border-radius: 8px;
-            padding: 15px;
+            padding: 12px 15px;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             position: relative;
-            font-size: 0.9em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 80px;
         }
         
         .subject:hover {
@@ -103,7 +106,8 @@
         
         .subject-name {
             font-weight: 500;
-            margin-bottom: 5px;
+            font-size: 0.95em;
+            margin-bottom: 10px;
         }
         
         .subject-id {
@@ -115,6 +119,12 @@
             background-color: #ecf0f1;
             padding: 2px 6px;
             border-radius: 4px;
+        }
+
+        .subject-meta {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            font-weight: 500;
         }
 
         /* --- Subject States --- */
@@ -148,19 +158,21 @@
         .tooltip {
             visibility: hidden;
             width: max-content;
+            max-width: 220px;
             background-color: var(--color-tooltip-bg);
             color: var(--color-tooltip-text);
             text-align: center;
             border-radius: 6px;
             padding: 8px 12px;
             position: absolute;
-            z-index: 1;
-            bottom: 110%;
+            z-index: 10;
+            bottom: 105%;
             left: 50%;
             transform: translateX(-50%);
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 0.85em;
+            pointer-events: none;
         }
         
         .tooltip::after { /* Tooltip arrow */
@@ -180,26 +192,9 @@
         }
         
         /* --- Responsive Design --- */
-        @media (max-width: 1200px) {
-            #career-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            body { padding: 1em; }
-            .header h1 { font-size: 2em; }
-            #career-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 500px) {
-            #career-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
+        @media (max-width: 1200px) { #career-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { body { padding: 1em; } .header h1 { font-size: 2em; } #career-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { #career-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -215,58 +210,57 @@
     <script>
         const materias = [
             // 1º Año
-            { id: 51, name: 'Introducción a la Contabilidad', year: 1, prereqs: [] },
-            { id: 52, name: 'Derecho Civil', year: 1, prereqs: [] },
-            { id: 53, name: 'Matemática I', year: 1, prereqs: [] },
-            { id: 54, name: 'Principios de Administración', year: 1, prereqs: [] },
-            { id: 55, name: 'Matemática II', year: 1, prereqs: [53] },
-            { id: 56, name: 'Contabilidad I', year: 1, prereqs: [51] },
-            { id: 57, name: 'Economía I', year: 1, prereqs: [] },
-            { id: 58, name: 'Derecho Constitucional', year: 1, prereqs: [] },
+            { id: 51, name: 'Introducción a la Contabilidad', year: 1, semester: 1, prereqs: [] },
+            { id: 52, name: 'Derecho Civil', year: 1, semester: 1, prereqs: [] },
+            { id: 53, name: 'Matemática I', year: 1, semester: 1, prereqs: [] },
+            { id: 54, name: 'Principios de Administración', year: 1, semester: 1, prereqs: [] },
+            { id: 55, name: 'Matemática II', year: 1, semester: 2, prereqs: [53] },
+            { id: 56, name: 'Contabilidad I', year: 1, semester: 2, prereqs: [51] },
+            { id: 57, name: 'Economía I', year: 1, semester: 2, prereqs: [] },
+            { id: 58, name: 'Derecho Constitucional', year: 1, semester: 2, prereqs: [] },
 
             // 2º Año
-            { id: 59, name: 'Matemática III', year: 2, prereqs: [53] },
-            { id: 60, name: 'Economía II', year: 2, prereqs: [57] },
-            { id: 61, name: 'Obligaciones, Contratos y Títulos de Crédito', year: 2, prereqs: [58] },
-            { id: 62, name: 'Filosofía', year: 2, prereqs: [] },
-            { id: 63, name: 'Escritura Académica y Oratoria', year: 2, prereqs: [54] },
-            { id: 64, name: 'Estadística I', year: 2, prereqs: [55] },
-            { id: 65, name: 'Derecho Administrativo', year: 2, prereqs: [52] },
-            { id: 66, name: 'Sociedades', year: 2, prereqs: [52] },
-            { id: 67, name: 'Seminario de Inglés Técnico', year: 2, prereqs: [] },
+            { id: 59, name: 'Matemática III', year: 2, semester: 1, prereqs: [53] },
+            { id: 60, name: 'Economía II', year: 2, semester: 1, prereqs: [57] },
+            { id: 61, name: 'Obligaciones, Contratos y Títulos de Crédito', year: 2, semester: 1, prereqs: [58] },
+            { id: 62, name: 'Filosofía', year: 2, semester: 1, prereqs: [] },
+            { id: 63, name: 'Escritura Académica y Oratoria', year: 2, semester: 2, prereqs: [54] },
+            { id: 64, name: 'Estadística I', year: 2, semester: 2, prereqs: [55] },
+            { id: 65, name: 'Derecho Administrativo', year: 2, semester: 2, prereqs: [52] },
+            { id: 66, name: 'Sociedades', year: 2, semester: 2, prereqs: [52] },
+            { id: 67, name: 'Seminario de Inglés Técnico', year: 2, semester: 2, prereqs: [] },
 
             // 3º Año
-            { id: 68, name: 'Cálculo Financiero', year: 3, prereqs: [55, 59] },
-            { id: 69, name: 'Seminario de Responsabilidad S.', year: 3, prereqs: [56, 66] },
-            { id: 70, name: 'Organización de Sistemas Administrativos', year: 3, prereqs: [54] },
-            { id: 71, name: 'Estadística II', year: 3, prereqs: [64] },
-            { id: 72, name: 'Derecho de Empresas en Crisis', year: 3, prereqs: [56, 66] },
-            { id: 73, name: 'Administración Financiera de Empresas I', year: 3, prereqs: [68, 60] },
-            { id: 74, name: 'Administración de Personal I', year: 3, prereqs: [54, 52] },
-            { id: 75, name: 'Derecho Tributario', year: 3, prereqs: [65] },
-            { id: 76, name: 'Métodos Cuantitativos para los Negocios', year: 3, prereqs: [59, 64] },
-            { id: 77, name: 'Taller de Seminario de TI', year: 3, prereqs: [59, 64, 68] },
+            { id: 68, name: 'Cálculo Financiero', year: 3, semester: 1, prereqs: [55, 59] },
+            { id: 69, name: 'Seminario de Responsabilidad S.', year: 3, semester: 1, prereqs: [56, 66] },
+            { id: 70, name: 'Organización de Sistemas Administrativos', year: 3, semester: 1, prereqs: [54] },
+            { id: 71, name: 'Estadística II', year: 3, semester: 1, prereqs: [64] },
+            { id: 72, name: 'Derecho de Empresas en Crisis', year: 3, semester: 2, prereqs: [56, 66] },
+            { id: 73, name: 'Administración Financiera de Empresas I', year: 3, semester: 2, prereqs: [68, 60] },
+            { id: 74, name: 'Administración de Personal I', year: 3, semester: 2, prereqs: [54, 52] },
+            { id: 75, name: 'Derecho Tributario', year: 3, semester: 2, prereqs: [65] },
+            { id: 76, name: 'Métodos Cuantitativos para los Negocios', year: 3, semester: 2, prereqs: [59, 64] },
+            { id: 77, name: 'Taller de Seminario de TI', year: 3, semester: 2, prereqs: [59, 64, 68] },
 
             // 4º Año
-            { id: 78, name: 'Derecho de Trabajo y de la S.S.', year: 4, prereqs: [58, 74] },
-            // --- LÍNEA CORREGIDA ---
-            { id: 79, name: 'Gestión de las Tecnologías de Información', year: 4, prereqs: [73] },
-            { id: 80, name: 'Contabilidad y Costos para la Gestión', year: 4, prereqs: [56, 59] },
-            { id: 81, name: 'Administración de Personal II', year: 4, prereqs: [58, 74] },
-            { id: 82, name: 'Administración y Hacienda Pública', year: 4, prereqs: [65] },
-            { id: 83, name: 'Administración Estratégica', year: 4, prereqs: [70, 73, 79] },
-            { id: 84, name: 'Administración de la Producción y Operaciones', year: 4, prereqs: [71, 76] },
-            { id: 85, name: 'Marketing Estratégico', year: 4, prereqs: [57, 64, 71, 76, 80] },
-            { id: 86, name: 'Actividad Curricular Optativa', year: 4, prereqs: [] },
+            { id: 78, name: 'Derecho de Trabajo y de la S.S.', year: 4, semester: 1, prereqs: [58, 74] },
+            { id: 79, name: 'Gestión de las Tecnologías de Información', year: 4, semester: 1, prereqs: [73] },
+            { id: 80, name: 'Contabilidad y Costos para la Gestión', year: 4, semester: 1, prereqs: [56, 59] },
+            { id: 81, name: 'Administración de Personal II', year: 4, semester: 1, prereqs: [58, 74] },
+            { id: 82, name: 'Administración y Hacienda Pública', year: 4, semester: 2, prereqs: [65] },
+            { id: 83, name: 'Administración Estratégica', year: 4, semester: 2, prereqs: [70, 73, 79] },
+            { id: 84, name: 'Administración de la Producción y Operaciones', year: 4, semester: 2, prereqs: [71, 76] },
+            { id: 85, name: 'Marketing Estratégico', year: 4, semester: 2, prereqs: [57, 64, 71, 76, 80] },
+            { id: 86, name: 'Actividad Curricular Optativa', year: 4, semester: 2, prereqs: [] },
 
             // 5º Año
-            { id: 87, name: 'Marketing Operativo', year: 5, prereqs: [85] },
-            { id: 88, name: 'Etica Profesional', year: 5, prereqs: [78,79,80,81,82,83,84,85,86] }, // Requiere 4to año regular
-            { id: 89, name: 'Administración Financiera de Empresas II', year: 5, prereqs: [71, 80, 73] },
-            { id: 90, name: 'Actividad Curricular Electiva', year: 5, prereqs: [] },
-            { id: 91, name: 'Plan de Negocios y Emprendimiento', year: 5, prereqs: [80, 83] },
-            { id: 92, name: 'Metodología de la Investigación Científica', year: 5, prereqs: [78,79,80,81,82,83,84,85,86] }, // Requiere 4to año regular
-            { id: 93, name: 'Práctica Prof. Supervisada', year: 5, prereqs: [83, 89] }, // Simplificado
+            { id: 87, name: 'Marketing Operativo', year: 5, semester: 1, prereqs: [85] },
+            { id: 88, name: 'Etica Profesional', year: 5, semester: 1, prereqs: [78,79,80,81,82,83,84,85,86] }, // Requiere 4to año regular
+            { id: 89, name: 'Administración Financiera de Empresas II', year: 5, semester: 1, prereqs: [71, 80, 73] },
+            { id: 90, name: 'Actividad Curricular Electiva', year: 5, semester: 2, prereqs: [] },
+            { id: 91, name: 'Plan de Negocios y Emprendimiento', year: 5, semester: 2, prereqs: [80, 83] },
+            { id: 92, name: 'Metodología de la Investigación Científica', year: 5, semester: 2, prereqs: [78,79,80,81,82,83,84,85,86] }, // Requiere 4to año regular
+            { id: 93, name: 'Práctica Prof. Supervisada', year: 5, semester: 2, prereqs: [67], minApproved: 28 }, // --- LÍNEA CORREGIDA ---
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -278,13 +272,25 @@
             }
 
             function checkPrerequisites(subject) {
-                if (subject.prereqs.length === 0) return { met: true, missing: [] };
-                
-                const missing = subject.prereqs.filter(prereqId => !approvedSubjects.has(prereqId));
+                const missingReasons = [];
+
+                // 1. Chequear correlativas directas
+                const missingCourses = subject.prereqs.filter(prereqId => !approvedSubjects.has(prereqId));
+                if (missingCourses.length > 0) {
+                    missingReasons.push(...missingCourses.map(id => getSubjectById(id).name));
+                }
+
+                // 2. Chequear cantidad mínima de materias aprobadas
+                if (subject.minApproved) {
+                    const approvedCount = approvedSubjects.size;
+                    if (approvedCount < subject.minApproved) {
+                        missingReasons.push(`Mínimo ${subject.minApproved} materias (tienes ${approvedCount})`);
+                    }
+                }
                 
                 return {
-                    met: missing.length === 0,
-                    missing: missing.map(id => getSubjectById(id).name)
+                    met: missingReasons.length === 0,
+                    missing: missingReasons
                 };
             }
             
@@ -294,9 +300,7 @@
 
             function toggleSubject(subjectId) {
                 const subjectElement = document.querySelector(`[data-id='${subjectId}']`);
-                if (subjectElement.classList.contains('locked')) {
-                    return; // Can't toggle locked subjects
-                }
+                if (subjectElement.classList.contains('locked')) return;
                 
                 if (approvedSubjects.has(subjectId)) {
                     approvedSubjects.delete(subjectId);
@@ -309,34 +313,28 @@
             }
 
             function updateUI() {
-                const allSubjectElements = document.querySelectorAll('.subject');
-                allSubjectElements.forEach(el => {
-                    const id = parseInt(el.dataset.id);
-                    const subject = getSubjectById(id);
+                materias.forEach(subject => {
+                    const el = document.querySelector(`[data-id='${subject.id}']`);
+                    if (!el) return;
+
                     const prereqStatus = checkPrerequisites(subject);
-                    
                     el.classList.remove('approved', 'locked');
                     const tooltip = el.querySelector('.tooltip');
 
-                    if (approvedSubjects.has(id)) {
+                    if (approvedSubjects.has(subject.id)) {
                         el.classList.add('approved');
-                        if (tooltip) tooltip.style.visibility = 'hidden';
+                    } else if (prereqStatus.met) {
+                        // Disponible para cursar
                     } else {
-                        if (prereqStatus.met) {
-                           // Available to be taken
-                           if (tooltip) tooltip.style.visibility = 'hidden';
-                        } else {
-                            el.classList.add('locked');
-                            if (tooltip) {
-                                tooltip.innerHTML = `Requiere:<br>${prereqStatus.missing.join('<br>')}`;
-                            }
+                        el.classList.add('locked');
+                        if (tooltip) {
+                            tooltip.innerHTML = `Requiere:<br>${prereqStatus.missing.join('<br>')}`;
                         }
                     }
                 });
             }
 
             function renderGrid() {
-                // Create columns
                 const years = [...new Set(materias.map(m => m.year))];
                 years.forEach(year => {
                     const column = document.createElement('div');
@@ -345,28 +343,6 @@
                     grid.appendChild(column);
                 });
 
-                // Create and place subject cards
                 materias.forEach(subject => {
                     const column = grid.children[subject.year - 1];
-                    const card = document.createElement('div');
-                    card.className = 'subject';
-                    card.dataset.id = subject.id;
-                    
-                    card.innerHTML = `
-                        <div class="subject-id">${subject.id}</div>
-                        <div class="subject-name">${subject.name}</div>
-                        <div class="tooltip"></div>
-                    `;
-                    
-                    card.addEventListener('click', () => toggleSubject(subject.id));
-                    column.appendChild(card);
-                });
-
-                updateUI();
-            }
-
-            renderGrid();
-        });
-    </script>
-</body>
-</html>
+                    const card
