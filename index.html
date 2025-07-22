@@ -220,7 +220,7 @@
                 { id: 60, name: 'Economía II', year: 2, semester: 1, prereqs: [57] },
                 { id: 61, name: 'Obligaciones, Contratos y Títulos de Crédito', year: 2, semester: 1, prereqs: [58] },
                 { id: 62, name: 'Filosofía', year: 2, semester: 1, prereqs: [] },
-                { id: 63, name: 'Escritura Académica y Oratoria', year: 2, semester: 2, prereqs: [54] },
+                { id: 63, name: 'Escritura Académica y Oratoria', year: 2, semester: 1, prereqs: [54] }, // CORREGIDO
                 { id: 64, name: 'Estadística I', year: 2, semester: 2, prereqs: [55] },
                 { id: 65, name: 'Derecho Administrativo', year: 2, semester: 2, prereqs: [52] },
                 { id: 66, name: 'Sociedades', year: 2, semester: 2, prereqs: [52] },
@@ -231,7 +231,7 @@
                 { id: 69, name: 'Seminario de Responsabilidad S.', year: 3, semester: 1, prereqs: [56, 66] },
                 { id: 70, name: 'Organización de Sistemas Administrativos', year: 3, semester: 1, prereqs: [54] },
                 { id: 71, name: 'Estadística II', year: 3, semester: 1, prereqs: [64] },
-                { id: 72, name: 'Derecho de Empresas en Crisis', year: 3, semester: 2, prereqs: [56, 66] },
+                { id: 72, name: 'Derecho de Empresas en Crisis', year: 3, semester: 1, prereqs: [56, 66] }, // CORREGIDO
                 { id: 73, name: 'Administración Financiera de Empresas I', year: 3, semester: 2, prereqs: [68, 60] },
                 { id: 74, name: 'Administración de Personal I', year: 3, semester: 2, prereqs: [54, 52] },
                 { id: 75, name: 'Derecho Tributario', year: 3, semester: 2, prereqs: [65] },
@@ -243,7 +243,7 @@
                 { id: 79, name: 'Gestión de las Tecnologías de Información', year: 4, semester: 1, prereqs: [73] },
                 { id: 80, name: 'Contabilidad y Costos para la Gestión', year: 4, semester: 1, prereqs: [56, 59] },
                 { id: 81, name: 'Administración de Personal II', year: 4, semester: 1, prereqs: [58, 74] },
-                { id: 82, name: 'Administración y Hacienda Pública', year: 4, semester: 2, prereqs: [65] },
+                { id: 82, name: 'Administración y Hacienda Pública', year: 4, semester: 1, prereqs: [65] }, // CORREGIDO
                 { id: 83, name: 'Administración Estratégica', year: 4, semester: 2, prereqs: [70, 73, 79] },
                 { id: 84, name: 'Administración de la Producción y Operaciones', year: 4, semester: 2, prereqs: [71, 76] },
                 { id: 85, name: 'Marketing Estratégico', year: 4, semester: 2, prereqs: [57, 64, 71, 76, 80] },
@@ -254,7 +254,7 @@
                 { id: 88, name: 'Etica Profesional', year: 5, semester: 1, prereqs: [78, 79, 80, 81, 82, 83, 84, 85, 86] },
                 { id: 89, name: 'Administración Financiera de Empresas II', year: 5, semester: 1, prereqs: [71, 80, 73] },
                 { id: 90, name: 'Actividad Curricular Electiva', year: 5, semester: 2, prereqs: [] },
-                { id: 91, name: 'Plan de Negocios y Emprendimiento', year: 5, semester: 2, prereqs: [80, 83] },
+                { id: 91, name: 'Plan de Negocios y Emprendimiento', year: 5, semester: 1, prereqs: [80, 83] }, // CORREGIDO
                 { id: 92, name: 'Metodología de la Investigación Científica', year: 5, semester: 2, prereqs: [78, 79, 80, 81, 82, 83, 84, 85, 86] },
                 { id: 93, name: 'Práctica Prof. Supervisada', year: 5, semester: 2, prereqs: [67], minApproved: 28 },
             ];
@@ -268,8 +268,6 @@
 
             function checkPrerequisites(subject, currentApprovedCount) {
                 const missingReasons = [];
-
-                // 1. Chequear correlativas directas
                 const missingCourses = subject.prereqs.filter(prereqId => !approvedSubjects.has(prereqId));
                 if (missingCourses.length > 0) {
                     const missingNames = missingCourses.map(id => {
@@ -278,12 +276,9 @@
                     });
                     missingReasons.push(...missingNames);
                 }
-
-                // 2. Chequear cantidad mínima de materias aprobadas
                 if (subject.minApproved && currentApprovedCount < subject.minApproved) {
                     missingReasons.push(`Mínimo ${subject.minApproved} materias (tienes ${currentApprovedCount})`);
                 }
-                
                 return {
                     met: missingReasons.length === 0,
                     missing: missingReasons
@@ -299,17 +294,12 @@
                 materias.forEach(subject => {
                     const el = document.querySelector(`[data-id='${subject.id}']`);
                     if (!el) return;
-
                     const prereqStatus = checkPrerequisites(subject, approvedCount);
-                    
                     el.classList.remove('approved', 'locked');
                     const tooltip = el.querySelector('.tooltip');
-
                     if (approvedSubjects.has(subject.id)) {
                         el.classList.add('approved');
-                    } else if (prereqStatus.met) {
-                        // Disponible para cursar
-                    } else {
+                    } else if (!prereqStatus.met) {
                         el.classList.add('locked');
                         if (tooltip) {
                             tooltip.innerHTML = `Requiere:<br>${prereqStatus.missing.join('<br>')}`;
@@ -327,7 +317,6 @@
                 } else {
                     approvedSubjects.add(subjectId);
                 }
-                
                 saveProgress();
                 updateUI();
             }
@@ -340,7 +329,6 @@
                     column.innerHTML = `<h2>${year}º Año</h2>`;
                     grid.appendChild(column);
                 });
-
                 materias.forEach(subject => {
                     const column = grid.children[subject.year - 1];
                     if (!column) {
@@ -350,18 +338,14 @@
                     const card = document.createElement('div');
                     card.className = 'subject';
                     card.dataset.id = subject.id;
-                    
                     card.innerHTML = `
                         <div class="subject-id">${subject.id}</div>
                         <div class="subject-name">${subject.name}</div>
                         <div class="subject-meta">${subject.semester}º Cuat.</div>
-                        <div class="tooltip"></div>
-                    `;
-                    
+                        <div class="tooltip"></div>`;
                     card.addEventListener('click', () => toggleSubject(subject.id));
                     column.appendChild(card);
                 });
-
                 updateUI();
             }
 
